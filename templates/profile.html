@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }} - Профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app">
+        <nav class="sidebar">
+            <a href="{{ url_for('index') }}" class="sidebar-logo">
+                Twitter Clone
+            </a>
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('index') }}" class="nav-button {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    Главная
+                </a>
+                <a href="{{ url_for('profile', username=session.get('username')) }}" 
+                   class="nav-button {% if request.endpoint == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user"></i>
+                    Профиль
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Выйти
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Войти
+                </a>
+                <a href="{{ url_for('register') }}" class="nav-button">
+                    <i class="fas fa-user-plus"></i>
+                    Регист��ация
+                </a>
+            {% endif %}
+        </nav>
+
+        <div class="main-container">
+            <main class="main-content">
+                <div class="profile-header">
+                    <img src="https://via.placeholder.com/150" alt="{{ user.username }}" class="profile-header-image">
+                    <div class="profile-info">
+                        <h1 class="profile-username">{{ user.username }}</h1>
+                        {% if session.get('user_id') == user.id %}
+                            <form method="POST" class="bio-form">
+                                <textarea name="bio" maxlength="160" placeholder="Расскажите о себе">{{ user.bio or '' }}</textarea>
+                                <button type="submit" class="save-bio-btn">Сохранить</button>
+                            </form>
+                        {% else %}
+                            <p class="profile-bio">{{ user.bio or 'Биография не указана' }}</p>
+                            {% if session.get('user_id') %}
+                                {% if is_following %}
+                                    <a href="{{ url_for('unfollow', username=user.username) }}" class="follow-btn following">
+                                        Отписаться
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('follow', username=user.username) }}" class="follow-btn">
+                                        Подписаться
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                        <div class="profile-stats">
+                            <span>Твитов: {{ tweets|length }}</span>
+                            <span>Подписчиков: {{ user.followers.count() }}</span>
+                            <span>Подписок: {{ user.followed.count() }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tweet-list">
+                    {% for tweet in tweets %}
+                        <div class="tweet">
+                            <div class="tweet-header">
+                                <img src="https://via.placeholder.com/48" alt="{{ tweet.author.username }}" class="tweet-user-image">
+                                <div class="tweet-user-info">
+                                    <a href="{{ url_for('profile', username=tweet.author.username) }}" class="tweet-username">
+                                        {{ tweet.author.username }}
+                                    </a>
+                                    <span class="tweet-time">{{ tweet.timestamp.strftime('%d %B %Y, %H:%M') }}</span>
+                                </div>
+                            </div>
+                            <div class="tweet-content">
+                                {{ tweet.content }}
+                            </div>
+                            <div class="tweet-actions">
+                                {% if session.get('user_id') %}
+                                    <form action="{{ url_for('like_tweet', tweet_id=tweet.id) }}" method="POST" class="like-form">
+                                        <button type="submit" class="like-btn">
+                                            {% if tweet.likes.filter_by(user_id=session['user_id']).first() %}
+                                                ❤️ {{ tweet.likes.count() }}
+                                            {% else %}
+                                                🤍 {{ tweet.likes.count() }}
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="like-count">❤️ {{ tweet.likes.count() }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> 

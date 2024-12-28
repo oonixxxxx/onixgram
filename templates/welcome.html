@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добро пожаловать в Twitter Clone</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="app">
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <h1>Добро пожаловать в Twitter Clone</h1>
+                <p>Присоединяйтесь к нашему сообществу прямо сейчас!</p>
+                
+                <div class="welcome-buttons">
+                    <a href="{{ url_for('register') }}" class="welcome-btn register">
+                        Создать аккаунт
+                    </a>
+                    <div class="welcome-divider">
+                        <span>или</span>
+                    </div>
+                    <a href="{{ url_for('login') }}" class="welcome-btn login">
+                        Войти
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
